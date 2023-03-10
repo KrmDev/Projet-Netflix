@@ -1,3 +1,70 @@
+<?php
+
+    session_start();
+
+	if(!empty($_POST["email"]) && !empty($_POST["password"])) {
+
+		// Connexion à la bdd 
+		require_once("src/connection.php");
+
+		// Variables
+		$email          = htmlspecialchars($_POST["email"]);
+        $password       = htmlspecialchars($_POST["password"]);
+
+		// L'adresse email est-elle correcte ?
+		if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+			header("location: index.php?error=1&message=Votre adresse email est invalide");
+            exit();
+
+		}
+
+		// Chiffrement du mot de passe
+		$password = "aq1".sha1($password."123")."25";
+
+		// L'adresse email est-elle bien utilisée ?
+		$req = $bdd->prepare("SELECT COUNT(*) as numberEmail FROM user WHERE email =?");
+		$req->execute([$email]);
+
+		while($emailVerification = $req->fetch()) {
+
+			if($emailVerification["numberEmail"] != 1) {
+
+				header("location: index.php?error=1&message=Impossible de vous authentifier correctement.");
+                exit();
+
+			}
+
+		}
+
+		// Connexion
+		$req = $bdd->prepare("SELECT * FROM user WHERE email =?");
+		$req->execute([$email]);
+
+		while($user = $req->fetch()) {
+
+			if($password == $user["password"]) {
+
+				$_SESSION["connect"] = 1;
+				$_SESSION["email"]   = $user["email"];
+
+				header("location: index.php?success=1");
+				exit();
+
+			}
+			else {
+
+				header("location: index.php?error=1&message=Impossible de vous authentifier correctement.");
+
+			}
+		}
+	}
+	
+    
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
