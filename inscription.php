@@ -2,6 +2,9 @@
 
 session_start();
 
+require_once("src/option.php");
+
+
 if(isset($_SESSION["connect"])) {
 
 	header("location: index.php");
