@@ -2,6 +2,13 @@
 
 session_start();
 
+if(isset($_SESSION["connect"])) {
+
+	header("location: index.php");
+	exit();
+	
+}
+
 if (!empty($_POST["email"]) && !empty($_POST["password"]) && !empty($_POST["password_two"])) {
 
 	// Connexion à la bdd
